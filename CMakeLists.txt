@@ -63,9 +63,9 @@ string(TOUPPER ${META_PROJECT_ID} META_PROJECT_ID)
 # 
 
 # Project options
-option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."              ON)
+option(BUILD_SHARED_LIBS     "Build shared instead of static libraries."              OFF)
 option(OPTION_SELF_CONTAINED "Create a self-contained install with all dependencies." OFF)
-option(OPTION_BUILD_TESTS    "Build tests."                                           ON)
+option(OPTION_BUILD_TESTS    "Build tests."                                           OFF)
 option(OPTION_BUILD_DOCS     "Build documentation."                                   OFF)
 option(OPTION_BUILD_EXAMPLES "Build examples."                                        OFF)
 option(OPTION_FORCE_SYSTEM_DIR_INSTALL "Force system dir install"                     OFF)
@@ -102,8 +102,8 @@ include(cmake/CompileOptions.cmake)
 # Project Health Check Setup
 # 
 
-enable_cppcheck(On)
-enable_clang_tidy(On)
+enable_cppcheck(Off)
+enable_clang_tidy(Off)
 
 
 # 

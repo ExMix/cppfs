@@ -6,14 +6,6 @@
 #include <iterator>
 #include <array>
 
-#if defined(__APPLE__)
-    #define COMMON_DIGEST_FOR_OPENSSL
-    #include <CommonCrypto/CommonDigest.h>
-    #define SHA1 CC_SHA1
-#else
-    #include <openssl/sha.h>
-#endif
-
 #include <basen/basen.hpp>
 
 #include <cppfs/fs.h>
@@ -21,7 +13,6 @@
 #include <cppfs/FileIterator.h>
 #include <cppfs/FileVisitor.h>
 #include <cppfs/FunctionalFileVisitor.h>
-#include <cppfs/Tree.h>
 #include <cppfs/AbstractFileSystem.h>
 #include <cppfs/AbstractFileHandleBackend.h>
 #include <cppfs/AbstractFileIteratorBackend.h>
@@ -155,61 +146,6 @@ void FileHandle::traverse(FileVisitor & visitor)
     }
 }
 
-std::unique_ptr<Tree> FileHandle::readTree(const std::string & path, bool includeHash) const
-{
-    // Check if file or directory exists
-    if (!exists())
-    {
-        return nullptr;
-    }
-
-    // Create tree
-    auto tree = std::unique_ptr<Tree>(new Tree);
-    tree->setPath(path);
-    tree->setFileName(fileName());
-    tree->setDirectory(isDirectory());
-    tree->setSize(size());
-    tree->setAccessTime(accessTime());
-    tree->setModificationTime(modificationTime());
-    tree->setUserId(userId());
-    tree->setGroupId(groupId());
-    tree->setPermissions(permissions());
-
-    if (includeHash)
-    {
-        tree->setSha1(sha1());
-    }
-
-    // Is this is directory?
-    if (isDirectory())
-    {
-        // Add children
-        for (auto it = begin(); it != end(); ++it)
-        {
-            // Open file or directory
-            FileHandle fh = open(*it);
-            if (!fh.exists()) continue;
-
-            // Compose name
-            std::string subName = path;
-            if (!subName.empty()) subName += "/";
-            subName += fh.fileName();
-
-            // Read subtree
-            auto subTree = fh.readTree(subName, includeHash);
-
-            // Add subtree to list
-            if (subTree)
-            {
-                tree->add(std::move(subTree));
-            }
-        }
-    }
-
-    // Return tree
-    return tree;
-}
-
 FileIterator FileHandle::begin() const
 {
     return m_backend ? FileIterator(m_backend->begin()) : FileIterator();
@@ -263,47 +199,6 @@ unsigned long FileHandle::permissions() const
 void FileHandle::setPermissions(unsigned long permissions)
 {
     if (m_backend) m_backend->setPermissions(permissions);
-}
-
-std::string FileHandle::sha1() const
-{
-    // Check file
-    if (!isFile())
-    {
-        return "";
-    }
-
-    // Open file
-    auto inputStream = createInputStream();
-    if (!inputStream)
-    {
-        return "";
-    }
-
-    // Initialize hash
-    unsigned char hash[20];
-    SHA_CTX context;
-    SHA1_Init(&context);
-
-    // Read whole while
-    while (!inputStream->eof())
-    {
-        // Read a maximum of 1024 bytes at once
-        // Read data from file
-        std::array<char, 1024> buf;
-        inputStream->read(buf.data(), buf.size());
-
-        size_t count = inputStream->gcount();
-        if (count > 0)
-        {
-            // Update hash
-            SHA1_Update(&context, buf.data(), count);
-        } else break;
-    }
-
-    // Compute hash
-    SHA1_Final(hash, &context);
-    return fs::hashToString(hash);
 }
 
 std::string FileHandle::base64() const

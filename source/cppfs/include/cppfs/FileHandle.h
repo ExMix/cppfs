@@ -18,7 +18,6 @@ namespace cppfs
 class AbstractFileHandleBackend;
 class FileIterator;
 class FileVisitor;
-class Tree;
 
 
 /**
@@ -210,20 +209,6 @@ public:
 
     /**
     *  @brief
-    *    Read directory tree
-    *
-    *  @param[in] path
-    *    File path for the root element
-    *  @param[in] includeHash
-    *    Compute SHA1 hash of each file? (slow, as each will must be read entirely)
-    *
-    *  @return
-    *    File tree, nullptr if this file does not exist
-    */
-    std::unique_ptr<Tree> readTree(const std::string & path = "", bool includeHash = false) const;
-
-    /**
-    *  @brief
     *    Get iterator that points to the first directory entry
     *
     *  @return
@@ -320,15 +305,6 @@ public:
     *    File permissions
     */
     void setPermissions(unsigned long permissions);
-
-    /**
-    *  @brief
-    *    Compute sha1 hash for file
-    *
-    *  @return
-    *    SHA1 hash, "" on error
-    */
-    std::string sha1() const;
 
     /**
     *  @brief

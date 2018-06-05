@@ -12,7 +12,6 @@ namespace cppfs
 
 
 class FileHandle;
-class LoginCredentials;
 
 
 /**
@@ -35,19 +34,7 @@ namespace fs
 *  @return
 *    File handle
 */
-CPPFS_API FileHandle open(const std::string & path, const LoginCredentials * credentials = nullptr);
-
-/**
-*  @brief
-*    Compute sha1 hash for string
-*
-*  @param[in] str
-*    String
-*
-*  @return
-*    SHA1 hash
-*/
-CPPFS_API std::string sha1(const std::string & str);
+CPPFS_API FileHandle open(const std::string & path);
 
 /**
 *  @brief

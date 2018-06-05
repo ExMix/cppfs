@@ -1,15 +1,5 @@
 
 # 
-# External dependencies
-# 
-
-find_package(LibSSH2 REQUIRED)
-find_package(LibCrypto)
-find_package(ZLIB)
-find_package(OpenSSL)
-
-
-# 
 # Library name and options
 # 
 
@@ -51,23 +41,13 @@ set(headers
     ${include_path}/AbstractFileIteratorBackend.h
     ${include_path}/InputStream.h
     ${include_path}/OutputStream.h
-    ${include_path}/LoginCredentials.h
     ${include_path}/FilePath.h
     ${include_path}/Url.h
-    ${include_path}/Tree.h
-    ${include_path}/Diff.h
-    ${include_path}/Change.h
     ${include_path}/units.h
 
     ${include_path}/${localfs}/LocalFileSystem.h
     ${include_path}/${localfs}/LocalFileHandle.h
     ${include_path}/${localfs}/LocalFileIterator.h
-
-    ${include_path}/ssh/SshFileSystem.h
-    ${include_path}/ssh/SshFileHandle.h
-    ${include_path}/ssh/SshFileIterator.h
-    ${include_path}/ssh/SshInputStreamBuffer.h
-    ${include_path}/ssh/SshOutputStreamBuffer.h
 )
 
 set(sources
@@ -82,22 +62,12 @@ set(sources
     ${source_path}/AbstractFileIteratorBackend.cpp
     ${source_path}/InputStream.cpp
     ${source_path}/OutputStream.cpp
-    ${source_path}/LoginCredentials.cpp
     ${source_path}/FilePath.cpp
     ${source_path}/Url.cpp
-    ${source_path}/Tree.cpp
-    ${source_path}/Diff.cpp
-    ${source_path}/Change.cpp
 
     ${source_path}/${localfs}/LocalFileSystem.cpp
     ${source_path}/${localfs}/LocalFileHandle.cpp
     ${source_path}/${localfs}/LocalFileIterator.cpp
-
-    ${source_path}/ssh/SshFileSystem.cpp
-    ${source_path}/ssh/SshFileHandle.cpp
-    ${source_path}/ssh/SshFileIterator.cpp
-    ${source_path}/ssh/SshInputStreamBuffer.cpp
-    ${source_path}/ssh/SshOutputStreamBuffer.cpp
 )
 
 # Group source files
@@ -131,6 +101,8 @@ generate_export_header(${target}
     EXPORT_MACRO_NAME ${export_macro}
 )
 
+set_target_properties(${target} PROPERTIES DEBUG_POSTFIX "_d")
+
 
 # 
 # Project options
@@ -155,8 +127,6 @@ target_include_directories(${target}
     ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
-    ${OPENSSL_INCLUDE_DIR}
-    ${LIBSSH2_INCLUDE_DIR}
 
     PUBLIC
     ${DEFAULT_INCLUDE_DIRECTORIES}
@@ -174,8 +144,6 @@ target_include_directories(${target}
 
 target_link_libraries(${target}
     PRIVATE
-    ${OPENSSL_LIBRARIES}
-    ${LIBSSH2_LIBRARY}
 
     PUBLIC
     ${DEFAULT_LIBRARIES}
@@ -186,22 +154,6 @@ target_link_libraries(${target}
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
     target_link_libraries(${target}
         PRIVATE
-        wsock32.lib
-        ws2_32.lib
-    )
-endif()
-
-if(LibCrypto_FOUND)
-    target_link_libraries(${target}
-        PRIVATE
-        ${LIBCRYPTO_LIBRARY}
-    )
-endif()
-
-if(ZLIB_FOUND)
-    target_link_libraries(${target}
-        PRIVATE
-        ${ZLIB_LIBRARY}
     )
 endif()
 
